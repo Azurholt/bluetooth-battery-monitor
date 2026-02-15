@@ -23,10 +23,12 @@ I'm not using UWP, only classic C/C++ API (check out [misc](./misc) directory fo
 
 ## Problems and workarounds:
 
-* The program supports only BLE reports for now. Obtaining battery status is easy for BLE,
-but HID and HFP devices use their own approach (see HID Usage Tables "Battery Strength" and `HFPGetBatteryLevel` accordingly).
+* Battery status is currently read from BLE characteristics only. The output also includes classic Bluetooth metadata (device class)
+when available, but classic battery reporting (for HID/HFP) is not implemented yet.
+* HID and HFP devices use their own battery reporting approach (see HID Usage Tables "Battery Strength" and `HFPGetBatteryLevel` accordingly).
 HFP devices also expose HID interface, probably it's all doable with HID API or a system-wide dll hook. Will implement later.
-* `BLUETOOTH_GATT_FLAG_FORCE_READ_FROM_DEVICE` (0x00000004) timeouts on disconnected devices, check their status first.
+* `BLUETOOTH_GATT_FLAG_FORCE_READ_FROM_DEVICE` (0x00000004) can timeout on disconnected devices.
+The script therefore uses cached reads for non-connected devices and forced reads only for connected devices.
 * `{00001800-0000-1000-8000-00805F9B34FB}` (Generic Attribute) is read only, don't use `GENERIC_WRITE` in `CreateFile`.
 
 ## References

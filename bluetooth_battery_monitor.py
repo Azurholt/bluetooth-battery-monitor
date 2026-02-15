@@ -156,10 +156,10 @@ class DEVPROPKEY(Structure):
         ('pid', DEVPROPID)]
 
 LPTSTR = POINTER(c_char)
-WBAse = windll.Kernel32
+WBase = windll.Kernel32
 ERROR_INSUFFICIENT_BUFFER = 0x7A
 ERROR_INVALID_DATA = 0xD
-GetLastError = WBAse.GetLastError
+GetLastError = WBase.GetLastError
 
 SPDRP_FRIENDLYNAME = DWORD(0x0000000C)
 SPDRP_DEVICEDESC = DWORD(0x00000000)
@@ -184,18 +184,18 @@ def GetDeviceNames(uuid='{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}'):
     i = 0
     while SAPI.SetupDiEnumDeviceInfo(hdi, i, byref(devinfo_data)):
         i += 1
-        hwid = get_device_info(hdi, i, devinfo_data, SPDRP_HARDWAREID)
+        hwid = get_device_info(hdi, devinfo_data, SPDRP_HARDWAREID)
         if not (hwid.startswith('BTHENUM\\Dev_') or hwid.startswith('BTHLE\\Dev_')):
             continue
-        name = get_device_info(hdi, i, devinfo_data, SPDRP_FRIENDLYNAME)
-        desc = get_device_info(hdi, i, devinfo_data, SPDRP_DEVICEDESC)
-        enum = get_device_info(hdi, i, devinfo_data, SPDRP_ENUMERATOR_NAME)
+        name = get_device_info(hdi, devinfo_data, SPDRP_FRIENDLYNAME)
+        desc = get_device_info(hdi, devinfo_data, SPDRP_DEVICEDESC)
+        enum = get_device_info(hdi, devinfo_data, SPDRP_ENUMERATOR_NAME)
         status = 'connected' if GetConnectedStatus(hdi, devinfo_data) else 'paired'
         db.append( { 'name':name, 'status':status, 'hwid':hwid } )
     return db
 
 
-def get_device_info(hdi, i, devinfo_data, propertyname):
+def get_device_info(hdi, devinfo_data, propertyname):
     data_t = DWORD()
     buffer = LPTSTR()
     buffersize = DWORD(0)
@@ -313,4 +313,3 @@ def main():
 
 if __name__=='__main__':
     main()
-
